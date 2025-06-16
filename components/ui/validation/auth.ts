@@ -11,6 +11,9 @@ export const registerSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters" }),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
+  agreeToTerms: z.boolean().refine((value) => value, {
+    message: "You must agree to the terms and conditions",
+  }),
 });
 
 export type RegisterSchema = z.infer<typeof registerSchema>;
