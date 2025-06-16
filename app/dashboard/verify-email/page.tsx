@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 
@@ -17,8 +17,15 @@ import { useAuthStore } from "@/state/auth-store";
 import { PageContainer } from "@/components/ui/page-container";
 import { OtpInput } from "@/components/ui/auth/otp-input";
 
+interface CustomError {
+  response: {
+    data: {
+      message: string;
+    };
+  };
+}
+
 export default function VerifyEmailPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoading } = useAuthStore();
 
@@ -46,7 +53,7 @@ export default function VerifyEmailPage() {
     if (combinedToken.length === 4 && !otpDigits.includes("")) {
       form.handleSubmit(onSubmit)();
     }
-  }, [otpDigits]);
+  }, [otpDigits, form]);
 
   // If token is in URL, submit automatically
   useEffect(() => {
@@ -54,17 +61,21 @@ export default function VerifyEmailPage() {
       form.setValue("token", tokenFromUrl);
       form.handleSubmit(onSubmit)();
     }
-  }, [tokenFromUrl]);
+  }, [tokenFromUrl, form]);
 
-  async function onSubmit(values: VerifyEmailSchema) {
+  async function onSubmit() {
     try {
       // await verifyEmail(values.token);
       setTimeout(() => {
         toast.success("Email verified successfully! You can now log in.");
         // router.push("/auth/login");
       }, 1000);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to verify email");
+    } catch (error: unknown) {
+      // TODO: handle error
+      const axiosError = error as CustomError;
+      toast.error(
+        axiosError.response?.data?.message || "Failed to verify email"
+      );
     }
   }
 
@@ -113,7 +124,7 @@ export default function VerifyEmailPage() {
                     <FormField
                       control={form.control}
                       name="token"
-                      render={({ field }) => (
+                      render={() => (
                         <FormItem>
                           <div className="space-y-4">
                             <OtpInput
@@ -153,7 +164,7 @@ export default function VerifyEmailPage() {
 
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
-                  Didn't receive the code?{" "}
+                  Don&apos;t receive the code?{" "}
                   <Link href="#" className="text-primary hover:underline">
                     Resend verification email
                   </Link>
