@@ -42,5 +42,13 @@ export const registerSchema = z.object({
   }),
 });
 
+export const verifyEmailSchema = z.object({
+  token: z
+    .string()
+    .min(1, { message: "Verification token is required" })
+    .max(4, { message: "Verification token must be 4 characters long" }),
+});
+
 export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
+export type VerifyEmailSchema = z.infer<typeof verifyEmailSchema>;
