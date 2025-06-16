@@ -11,10 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/ui/page-container";
-import {
-  registerSchema,
-  RegisterSchema,
-} from "@/components/ui/validation/auth";
+import { loginSchema, LoginSchema } from "@/components/ui/validation/auth";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,15 +20,12 @@ import { SocialButton } from "@/components/ui/auth/social-button";
 import { SocialProvider } from "@/types/auth";
 import { Checkbox } from "@/components/ui/checkbox";
 
-const RegisterPage = () => {
-  const form = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema),
+const LoginPage = () => {
+  const form = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      firstName: "",
-      lastName: "",
-      agreeToTerms: false,
     },
   });
 
@@ -41,7 +35,7 @@ const RegisterPage = () => {
     console.log(provider);
   };
 
-  const onSubmit = async (data: RegisterSchema) => {
+  const onSubmit = async (data: LoginSchema) => {
     try {
       await register(data);
     } catch (error) {
@@ -164,34 +158,6 @@ const RegisterPage = () => {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
                 <FormField
                   control={form.control}
                   name="password"
@@ -210,40 +176,23 @@ const RegisterPage = () => {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="agreeToTerms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="cursor-pointer">
-                          I agree to the terms and conditions
-                        </FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
                 <Button
                   type="submit"
                   className="w-full mt-2"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating account..." : "Create account"}
+                  {isLoading ? "Logging in..." : "Login"}
                 </Button>
               </form>
             </Form>
 
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-primary hover:underline">
-                Sign in
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/auth/register"
+                className="text-primary hover:underline"
+              >
+                Register
               </Link>
             </p>
           </div>
@@ -253,4 +202,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default LoginPage;
