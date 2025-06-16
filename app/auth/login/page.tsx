@@ -18,7 +18,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/state/auth-store";
 import { SocialButton } from "@/components/ui/auth/social-button";
 import { SocialProvider } from "@/types/auth";
-import { Checkbox } from "@/components/ui/checkbox";
 
 const LoginPage = () => {
   const form = useForm<LoginSchema>({
