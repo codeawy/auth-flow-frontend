@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "@/state/auth-store";
 
 const RegisterPage = () => {
   const form = useForm<RegisterSchema>({
@@ -30,8 +31,14 @@ const RegisterPage = () => {
     },
   });
 
-  const onSubmit = (data: RegisterSchema) => {
-    console.log(data);
+  const { register, isLoading } = useAuthStore((state) => state);
+
+  const onSubmit = async (data: RegisterSchema) => {
+    try {
+      await register(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -96,19 +103,6 @@ const RegisterPage = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <div className="flex items-center space-x-2 mt-4">
             <input
@@ -128,8 +122,8 @@ const RegisterPage = () => {
             </label>
           </div>
 
-          <Button type="submit" className="w-full mt-2">
-            Create account
+          <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+            {isLoading ? "Creating account..." : "Create account"}
           </Button>
         </form>
       </Form>

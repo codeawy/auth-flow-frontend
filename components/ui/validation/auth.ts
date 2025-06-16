@@ -9,9 +9,6 @@ export const registerSchema = z.object({
     .string()
     .min(1, { message: "Password is required" })
     .min(6, { message: "Password must be at least 6 characters" }),
-  confirmPassword: z
-    .string()
-    .min(1, { message: "Please confirm your password" }),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
 });
