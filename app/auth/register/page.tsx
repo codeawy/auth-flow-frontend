@@ -43,7 +43,7 @@ const RegisterPage = () => {
 
   const onSubmit = async (data: RegisterSchema) => {
     try {
-      await register(data);
+      await register({ ...data, fullName: "balblalblalba" });
     } catch (error) {
       console.error(error);
     }
