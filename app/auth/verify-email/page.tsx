@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { toast } from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -13,11 +12,12 @@ import { verifyEmailSchema, type VerifyEmailSchema } from "@/validation/auth";
 import { useAuthStore } from "@/state/auth-store";
 import { PageContainer } from "@/components/ui/page-container";
 import { OtpInput } from "@/components/ui/auth/otp-input";
+import { toast } from "sonner";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isLoading } = useAuthStore();
+  const { isLoading, verifyEmail, error } = useAuthStore();
 
   // Get token from URL if available
   const tokenFromUrl = searchParams?.get("token") || "";
@@ -54,11 +54,10 @@ export default function VerifyEmailPage() {
   }, [tokenFromUrl]);
 
   async function onSubmit(values: VerifyEmailSchema) {
-    try {
-      toast.success("Email verified successfully! You can now log in.");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to verify email");
-    }
+    // Write your logic here...
+    await verifyEmail(values.token);
+    // TODO: redirect to login page if there's no error
+    // router.push("/auth/login");
   }
 
   return (
