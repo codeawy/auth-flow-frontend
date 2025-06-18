@@ -20,7 +20,7 @@ interface AuthStore {
     firstName,
     lastName,
   }: RegisterParams) => Promise<void>;
-  verifyEmail: (token: string) => Promise<void>;
+  verifyEmail: (token: string) => Promise<boolean>;
 }
 
 interface RegisterParams {
@@ -72,7 +72,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
       await api.post("/api/v1/auth/verify-email", {
         token,
       });
-      toast("Email verified successfully! You can now log in.");
+      toast("Email verified successfully! You can now log in.", {
+        className: "!bg-green-500 !text-white",
+      });
+      return true; // Return true on success
     } catch (error) {
       console.log(error);
 
@@ -83,7 +86,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
       set({
         error: errorMessage,
       });
-      toast(errorMessage);
+      toast(errorMessage, {
+        className: "!bg-red-600 !text-white",
+      });
+      return false; // Return false on failure
     } finally {
       set({
         isLoading: false,

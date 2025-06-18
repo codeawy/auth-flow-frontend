@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -12,7 +12,6 @@ import { verifyEmailSchema, type VerifyEmailSchema } from "@/validation/auth";
 import { useAuthStore } from "@/state/auth-store";
 import { PageContainer } from "@/components/ui/page-container";
 import { OtpInput } from "@/components/ui/auth/otp-input";
-import { toast } from "sonner";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -34,6 +33,19 @@ export default function VerifyEmailPage() {
     },
   });
 
+  const onSubmit = useCallback(
+    async (values: VerifyEmailSchema) => {
+      // Attempt to verify email - now returns a boolean indicating success
+      const isSuccess = await verifyEmail(values.token);
+      
+      // Only navigate on successful verification
+      if (isSuccess) {
+        router.push("/auth/login");
+      }
+    },
+    [verifyEmail, router]
+  );
+
   // Update form value when OTP digits change
   useEffect(() => {
     const combinedToken = otpDigits.join("");
@@ -43,7 +55,7 @@ export default function VerifyEmailPage() {
     if (combinedToken.length === 4 && !otpDigits.includes("")) {
       form.handleSubmit(onSubmit)();
     }
-  }, [otpDigits]);
+  }, [otpDigits, form, onSubmit]);
 
   // If token is in URL, submit automatically
   useEffect(() => {
@@ -51,14 +63,7 @@ export default function VerifyEmailPage() {
       form.setValue("token", tokenFromUrl);
       form.handleSubmit(onSubmit)();
     }
-  }, [tokenFromUrl]);
-
-  async function onSubmit(values: VerifyEmailSchema) {
-    // Write your logic here...
-    await verifyEmail(values.token);
-    // TODO: redirect to login page if there's no error
-    // router.push("/auth/login");
-  }
+  }, [tokenFromUrl, form, onSubmit]);
 
   return (
     <PageContainer
@@ -105,7 +110,7 @@ export default function VerifyEmailPage() {
                     <FormField
                       control={form.control}
                       name="token"
-                      render={({ field }) => (
+                      render={() => (
                         <FormItem>
                           <div className="space-y-4">
                             <OtpInput
@@ -145,7 +150,7 @@ export default function VerifyEmailPage() {
 
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
-                  Didn't receive the code?{" "}
+                  Did not receive the code?{" "}
                   <Link href="#" className="text-primary hover:underline">
                     Resend verification email
                   </Link>
