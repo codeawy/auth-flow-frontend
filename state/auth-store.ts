@@ -11,7 +11,7 @@ interface User {
 
 interface AuthStore {
   isLoading: boolean;
-  error: null | string;
+  error: null | string | string[];
   user: User | null;
   register: ({
     email,
@@ -49,7 +49,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
         lastName,
       });
     } catch (error) {
-      console.log(error);
       const errorMessage = isAxiosError(error)
         ? error.response?.data?.message
         : "An error occurred during registration";
