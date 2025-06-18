@@ -22,6 +22,8 @@ import { useAuthStore } from "@/state/auth-store";
 import { SocialButton } from "@/components/ui/auth/social-button";
 import { SocialProvider } from "@/types/auth";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
 
 const RegisterPage = () => {
   const form = useForm<RegisterSchema>({
@@ -35,7 +37,8 @@ const RegisterPage = () => {
     },
   });
 
-  const { register, isLoading } = useAuthStore((state) => state);
+  const { register, isLoading, error } = useAuthStore((state) => state);
+  console.log(error);
 
   const handleSocialLogin = (provider: SocialProvider) => {
     console.log(provider);
@@ -49,11 +52,38 @@ const RegisterPage = () => {
     }
   };
 
+  // if (error) {
+  //   return <h3>{error}</h3>;
+  // }
+
   return (
     <PageContainer
       maxWidth="full"
       className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"
     >
+      {typeof error === "string" && (
+        <Alert variant="destructive" className="w-1/2 mx-auto my-5">
+          <AlertCircleIcon />
+          <AlertTitle>Unable to process your registration.</AlertTitle>
+          <AlertDescription>
+            <p>{error}</p>
+          </AlertDescription>
+        </Alert>
+      )}
+      {Array.isArray(error) && error.length > 0 && (
+        <Alert variant="destructive" className="w-1/2 mx-auto my-5">
+          <AlertCircleIcon />
+          <AlertTitle>Unable to process your registration.</AlertTitle>
+          <AlertDescription>
+            <p>Please fix the following errors:</p>
+            <ul className="list-inside list-disc text-sm">
+              {error.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
       <div className="w-full max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center rounded-xl overflow-hidden shadow-2xl bg-white dark:bg-gray-800">
         {/* Left side - illustration */}
         <div className="hidden md:block relative h-full min-h-[700px] bg-primary">

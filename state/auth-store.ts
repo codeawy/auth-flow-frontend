@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import api from "@/lib/axios";
+import { isAxiosError } from "axios";
 
 interface User {
   email: string;
@@ -9,45 +11,55 @@ interface User {
 
 interface AuthStore {
   isLoading: boolean;
+  error: null | string | string[];
   user: User | null;
   register: ({
     email,
     password,
     firstName,
     lastName,
-  }: {
-    email: string;
-    password: string;
-    firstName?: string;
-    lastName?: string;
-  }) => Promise<void>;
+  }: RegisterParams) => Promise<void>;
+}
+
+interface RegisterParams {
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   isLoading: false,
+  error: null,
   user: null,
-  register: ({
+  register: async ({
     email,
     password,
     firstName,
     lastName,
-  }: {
-    email: string;
-    password: string;
-    firstName?: string;
-    lastName?: string;
-  }) => {
-    set({
-      isLoading: true,
-    });
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        set({
-          user: { email, password, firstName, lastName },
-          isLoading: false,
-        });
-        resolve();
-      }, 1000);
-    });
+  }: RegisterParams) => {
+    try {
+      set({
+        isLoading: true,
+      });
+      await api.post("/api/v1/auth/register", {
+        email,
+        password,
+        firstName,
+        lastName,
+      });
+    } catch (error) {
+      const errorMessage = isAxiosError(error)
+        ? error.response?.data?.message
+        : "An error occurred during registration";
+
+      set({
+        error: errorMessage,
+      });
+    } finally {
+      set({
+        isLoading: false,
+      });
+    }
   },
 }));
