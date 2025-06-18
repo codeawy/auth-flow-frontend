@@ -11,37 +11,30 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/ui/page-container";
-import { registerSchema, RegisterSchema } from "@/validation/auth";
+import { loginSchema, LoginSchema } from "@/validation/auth";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthStore } from "@/state/auth-store";
 import { SocialButton } from "@/components/ui/auth/social-button";
 import { SocialProvider } from "@/types/auth";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircleIcon } from "lucide-react";
 
-const RegisterPage = () => {
-  const form = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema),
+const LoginPage = () => {
+  const form = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      firstName: "",
-      lastName: "",
-      agreeToTerms: false,
     },
   });
 
-  const { register, isLoading, error } = useAuthStore((state) => state);
-  console.log(error);
+  const { register, isLoading } = useAuthStore((state) => state);
 
   const handleSocialLogin = (provider: SocialProvider) => {
     console.log(provider);
   };
 
-  const onSubmit = async (data: RegisterSchema) => {
+  const onSubmit = async (data: LoginSchema) => {
     try {
       await register(data);
     } catch (error) {
@@ -49,38 +42,11 @@ const RegisterPage = () => {
     }
   };
 
-  // if (error) {
-  //   return <h3>{error}</h3>;
-  // }
-
   return (
     <PageContainer
       maxWidth="full"
       className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900"
     >
-      {typeof error === "string" && (
-        <Alert variant="destructive" className="w-1/2 mx-auto my-5">
-          <AlertCircleIcon />
-          <AlertTitle>Unable to process your registration.</AlertTitle>
-          <AlertDescription>
-            <p>{error}</p>
-          </AlertDescription>
-        </Alert>
-      )}
-      {Array.isArray(error) && error.length > 0 && (
-        <Alert variant="destructive" className="w-1/2 mx-auto my-5">
-          <AlertCircleIcon />
-          <AlertTitle>Unable to process your registration.</AlertTitle>
-          <AlertDescription>
-            <p>Please fix the following errors:</p>
-            <ul className="list-inside list-disc text-sm">
-              {error.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
-      )}
       <div className="w-full max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-center rounded-xl overflow-hidden shadow-2xl bg-white dark:bg-gray-800">
         {/* Left side - illustration */}
         <div className="hidden md:block relative h-full min-h-[700px] bg-primary">
@@ -191,34 +157,6 @@ const RegisterPage = () => {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
                 <FormField
                   control={form.control}
                   name="password"
@@ -237,40 +175,23 @@ const RegisterPage = () => {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="agreeToTerms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="cursor-pointer">
-                          I agree to the terms and conditions
-                        </FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
                 <Button
                   type="submit"
                   className="w-full mt-2"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating account..." : "Create account"}
+                  {isLoading ? "Logging in..." : "Login"}
                 </Button>
               </form>
             </Form>
 
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-primary hover:underline">
-                Sign in
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/auth/register"
+                className="text-primary hover:underline"
+              >
+                Register
               </Link>
             </p>
           </div>
@@ -280,4 +201,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default LoginPage;
